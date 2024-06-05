@@ -9,7 +9,7 @@ license = "MIT"
 description = "Tetris game in Typst"
 keywords = ["game", "fun", "tetris"]
 categories = ["fun"]
-exclude = ["thumbnail.png"]
+exclude = ["thumbnail.png", "demo.gif"]
 
 [template]
 path = "template"
