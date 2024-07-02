@@ -46,4 +46,20 @@ If you want to play different game scenarios, you can change the game seed using
 
 Replace `123` with any number of your choice.
 
+## Changing Key Bindings
+
+Modify the `actions` parameter in the `game.with` method to change the key bindings. The default key bindings are as follows:
+
+
+```typst
+#show: game.with(seed: 0, actions: (
+  left: ("a", ),
+  right: ("d", ),
+  down: ("s", ),
+  left-rotate: ("q", ),
+  right-rotate: ("e", ),
+  half-turn: ("w", ),
+  fast-drop: ("f", ),
+))
+```
 

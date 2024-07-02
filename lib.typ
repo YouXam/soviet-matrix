@@ -12,7 +12,7 @@
       it.children.map(extract).join()
     }
   }
-  extract(body).clusters().map(lower).filter(c => c in "wasdfqe")
+  extract(body).clusters().map(lower)
 }
 
 #let minoes = (("ZZ_", "_ZZ"), ("OO", "OO"), ("_SS", "SS_"), ("IIII",), ("__L", "LLL"), ("J__", "JJJ"), ("_T_", "TTT"))
@@ -187,10 +187,18 @@
   state
 }
 
-#let game(body, seed: 2, cols: 10, rows: 20) = {
+#let game(body, seed: 2, cols: 10, rows: 20, actions: (
+  left: ("a", ),
+  right: ("d", ),
+  down: ("s", ),
+  left-rotate: ("q", ),
+  right-rotate: ("e", ),
+  half-turn: ("w", ),
+  fast-drop: ("f", ),
+)) = {
   set page(height: auto, width: auto, margin: (top: 0.5in - 30pt, bottom: 0.5in + 40pt, rest: 0.5in))
 
-  let actions = parse-actions(body)
+  let chars = parse-actions(body)
 
   let state = (
     rng: gen-rng(seed),
@@ -204,21 +212,22 @@
   (state.rng, state.current) = new-mino(state.rng, cols, rows)
   (state.rng, state.next) = new-mino(state.rng, cols, rows)
 
-  for action in actions {
-    if action == "a" {
+  for char in chars {
+
+    if actions.left.any(it => it == char) {
       (state, _) = move(state, cols: cols, rows: rows, dx: -1, dy: 0)
-    } else if action == "d" {
+    } else if actions.right.any(it => it == char) {
       (state, _) = move(state, cols: cols, rows: rows, dx: 1, dy: 0)
-    } else if action == "f" or action == " " {
+    } else if actions.fast-drop.any(it => it == char) {
       let success = true
       while success {
         (state, success) = move(state, cols: cols, rows: rows, dy: -1)
       }
-    } else if action == "e" {
+    } else if actions.right-rotate.any(it => it == char) {
       state = rotate(state, angle: 1, cols: cols, rows: rows)
-    } else if action == "q" {
+    } else if actions.left-rotate.any(it => it == char) {
       state = rotate(state, angle: 3, cols: cols, rows: rows)
-    } else if action == "w" {
+    } else if actions.half-turn.any(it => it == char) {
       state = rotate(state, angle: 2, cols: cols, rows: rows)
     }
     state = next-tick(state, cols: cols, rows: rows)
