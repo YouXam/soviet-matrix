@@ -34,6 +34,7 @@ Enjoy the game!
 - Rotate Left: q
 - Rotate Right: e
 - 180-degree Rotate: w
+- Hold Piece: c
 
 ## Changing the Game Seed
 
@@ -60,6 +61,7 @@ Modify the `actions` parameter in the `game.with` method to change the key bindi
   right-rotate: ("e", ),
   half-turn: ("w", ),
   fast-drop: ("f", ),
+  hold-mino: ("c", ),
 ))
 ```
 

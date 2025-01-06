@@ -9,6 +9,7 @@ Hard Drop: f
 Rotate Left: q
 Rotate Right: e
 180-degree Rotate: w
+Hold Piece: c
 
 Enter characters below to get started.
 */
