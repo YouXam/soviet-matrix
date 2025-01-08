@@ -17,15 +17,21 @@
 
 #let minoes = (("ZZ_", "_ZZ"), ("OO", "OO"), ("_SS", "SS_"), ("IIII",), ("__L", "LLL"), ("J__", "JJJ"), ("_T_", "TTT"))
 
-#let new-mino(rng, cols, rows) = {
-  let (rng, mino) = choice(rng, minoes)
+#let create-mino(mino, cols, rows) = {
   let width = calc.max(..mino.map(it => it.len()))
-  (rng, (
+  (
     mino: mino,
     pos: (x: calc.floor(cols / 2) - calc.floor(width / 2) - 1, y: rows + 1),
     height: mino.len(),
     width: width,
-  ))
+    index: minoes.position((value)=>{value==mino})
+  )
+}
+
+#let new-mino(rng, cols, rows) = {
+  let (rng, mino) = choice(rng, minoes)
+  let width = calc.max(..mino.map(it => it.len()))
+  (rng, create-mino(mino, cols, rows))
 }
 
 #let render-map(map, bg-color: rgb("#f3f3ed")) = {
@@ -68,6 +74,7 @@
     pos: (x: center.x - calc.floor(mino.height / 2), y: center.y + calc.floor(mino.width / 2)),
     height: mino.width,
     width: mino.height,
+    index: mino.index,
   )
 }
 
@@ -91,6 +98,23 @@
   } else {
     (state, false)
   }
+}
+
+#let hold(state, cols: 10, rows: 20) = {
+  if state.can-hold == false {
+    return state
+  }
+  state.can-hold = false
+  if state.hold == none {
+    state.hold = create-mino(minoes.at(state.current.index), cols, rows)
+    state.current = state.next
+    (state.rng, state.next) = new-mino(state.rng, cols, rows)
+  } else {
+    let hold-mino = state.hold
+    state.hold = create-mino(minoes.at(state.current.index), cols, rows)
+    state.current = hold-mino
+  }
+  return state
 }
 
 #let render(state, cols: 10, rows: 20) = {
@@ -153,6 +177,19 @@
     ])
     #block(height: 4em, width: 6em, stroke: luma(80%) + 0.5pt, radius: 2pt, [
       #set block(spacing: 0pt)
+      #pad(top: 2pt, left: 3pt, bottom: 0pt, [*Hold*])
+      #if state.hold != none [
+        #align(center + horizon)[
+          #render-map(state.hold.mino.map(it => it.split("")).rev(), bg-color: white.transparentize(100%))
+        ]
+      ] else [
+        #align(center + horizon)[
+          None
+        ]
+      ]
+    ])
+    #block(height: 4em, width: 6em, stroke: luma(80%) + 0.5pt, radius: 2pt, [
+      #set block(spacing: 0pt)
       #pad(top: 2pt, left: 3pt, bottom: 0pt, [*Score*])
       #align(center + horizon)[
         #state.score
@@ -172,6 +209,7 @@
         }
       }
     }
+    state.can-hold = true
     state.current = state.next
     (state.rng, state.next) = new-mino(state.rng, cols, rows)
   }
@@ -195,6 +233,7 @@
   right-rotate: ("e", ),
   half-turn: ("w", ),
   fast-drop: ("f", ),
+  hold-mino: ("c", ),
 )) = {
   set page(height: auto, width: auto, margin: (top: 0.5in - 30pt, bottom: 0.5in + 40pt, rest: 0.5in))
 
@@ -207,13 +246,14 @@
     map: range(rows + 4).map(_ => range(cols).map(it => "_")),
     end: false,
     score: 0,
+    hold: none,
+    can-hold: true,
   )
 
   (state.rng, state.current) = new-mino(state.rng, cols, rows)
   (state.rng, state.next) = new-mino(state.rng, cols, rows)
 
   for char in chars {
-
     if actions.left.any(it => it == char) {
       (state, _) = move(state, cols: cols, rows: rows, dx: -1, dy: 0)
     } else if actions.right.any(it => it == char) {
@@ -229,6 +269,8 @@
       state = rotate(state, angle: 3, cols: cols, rows: rows)
     } else if actions.half-turn.any(it => it == char) {
       state = rotate(state, angle: 2, cols: cols, rows: rows)
+    } else if actions.hold-mino.any(it => it == char) {
+      state = hold(state, cols: cols, rows: rows)
     }
     state = next-tick(state, cols: cols, rows: rows)
     state = eliminate(state, cols: cols, rows: rows)
