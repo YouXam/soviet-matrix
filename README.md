@@ -20,7 +20,7 @@ You can play the game in two ways:
      ```
    - Typst will create a new directory.
    - Open `main.typ` in the created directory.
-   - Use the [Typst Preview VS Code extension](https://marketplace.visualstudio.com/items?itemName=mgt19937.typst-preview) for live preview and gameplay.
+   - Use the [Tinymist Typst VS Code extension](https://marketplace.visualstudio.com/items/?itemName=myriad-dreamin.tinymist) for live preview and gameplay.
 
 Enjoy the game!
 
