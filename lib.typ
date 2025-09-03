@@ -228,10 +228,7 @@
     }
     state.can-hold = true
     state.current = state.next
-  let (rng-after-draw, bag-after-draw, next-mino) = new-mino(state.rng, state.mino-bag, cols, rows)
-  state.rng = rng-after-draw
-  state.mino-bag = bag-after-draw
-  state.next = next-mino
+   (state.rng, state.mino-bag, state.next) = new-mino(state.rng, state.mino-bag, cols, rows)
   }
   state
 }
