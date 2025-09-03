@@ -9,7 +9,7 @@ This is a classic Tetris game implemented using Typst. The goal is to manipulate
 You can play the game in two ways:
 
 1. **Online:**
-   - Visit [https://typst.app/app?template=soviet-matrix&version=0.1.1](https://typst.app/app?template=soviet-matrix&version=0.1.1).
+   - Visit [https://typst.app/app?template=soviet-matrix&version=latest](https://typst.app/app?template=soviet-matrix&version=latest).
    - Enter any title of your choice and click **Create**.
 
 2. **Locally:**
@@ -41,7 +41,7 @@ Enjoy the game!
 If you want to play different game scenarios, you can change the game seed using the following method:
 
 ```typst
-#import "@preview/soviet-matrix:0.1.0": game
+#import "@preview/soviet-matrix:0.2.1": game
 #show: game.with(seed: 123) // Change the game seed
 ```
 

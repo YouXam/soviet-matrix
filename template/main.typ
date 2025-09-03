@@ -1,4 +1,4 @@
-#import "@preview/soviet-matrix:0.2.0": game
+#import "@preview/soviet-matrix:0.2.1": game
 #show: game.with(seed: 0)
 
 /*
