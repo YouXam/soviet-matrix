@@ -270,19 +270,8 @@
     can-hold: true,
   )
 
-  let (rng-after-current-draw, bag-after-current-draw, current-mino) = new-mino(rng-after-initial-bag, bag-after-initial-bag, cols, rows)
-  let (rng-after-next-draw, bag-after-next-draw, next-mino) = new-mino(rng-after-current-draw, bag-after-current-draw, cols, rows)
-  let state = (
-    rng: rng-after-next-draw,
-    mino-bag: bag-after-next-draw,
-    current: current-mino,
-    next: next-mino,
-    map: range(rows + 4).map(_ => range(cols).map(it => "_")),
-    end: false,
-    score: 0,
-    hold: none,
-    can-hold: true,
-  )
+  (state.rng, state.mino-bag, state.current) = new-mino(rng-after-initial-bag, bag-after-initial-bag, cols, rows)
+  (state.rng, state.mino-bag, state.next) = new-mino(state.rng, state.mino-bag, cols, rows)
 
   for char in chars {
     if actions.left.any(it => it == char) {
