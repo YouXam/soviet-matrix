@@ -125,10 +125,7 @@
   if state.hold == none {
     state.hold = create-mino(minoes.at(state.current.index), cols, rows)
     state.current = state.next
-  let (rng-after-draw, bag-after-draw, next-mino) = new-mino(state.rng, state.mino-bag, cols, rows)
-  state.rng = rng-after-draw
-  state.mino-bag = bag-after-draw
-  state.next = next-mino
+    (state.rng, state.mino-bag, state.next) = new-mino(state.rng, state.mino-bag, cols, rows)
   } else {
     let hold-mino = state.hold
     state.hold = create-mino(minoes.at(state.current.index), cols, rows)
