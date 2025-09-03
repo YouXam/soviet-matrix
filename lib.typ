@@ -1,4 +1,4 @@
-#import "@preview/suiji:0.3.0": gen-rng, choice
+#import "@preview/suiji:0.3.0": gen-rng, choice, shuffle
 #import "mino/tetris.typ": render-field
 
 #let parse-actions(body) = {
@@ -17,6 +17,12 @@
 
 #let minoes = (("ZZ_", "_ZZ"), ("OO", "OO"), ("_SS", "SS_"), ("IIII",), ("__L", "LLL"), ("J__", "JJJ"), ("_T_", "TTT"))
 
+#let shuffle-minoes(rng) = {
+  let indices = range(minoes.len())
+  let (rng-after-shuffle, shuffled) = shuffle(rng, indices)
+  (rng-after-shuffle, shuffled.map(i => minoes.at(i)))
+}
+
 #let create-mino(mino, cols, rows) = {
   let width = calc.max(..mino.map(it => it.len()))
   (
@@ -28,10 +34,21 @@
   )
 }
 
-#let new-mino(rng, cols, rows) = {
-  let (rng, mino) = choice(rng, minoes)
-  let width = calc.max(..mino.map(it => it.len()))
-  (rng, create-mino(mino, cols, rows))
+#let new-mino(rng, bag, cols, rows) = {
+  let mino-bag = bag
+  let rng-before-draw = rng
+  let mino = none
+  let bag-before-draw = mino-bag
+  let rng-after-bag = rng-before-draw
+  let bag-after-bag = bag-before-draw
+  if mino-bag.len() == 0 {
+    let (rng-after-shuffle, new-bag) = shuffle-minoes(rng-before-draw)
+    bag-after-bag = new-bag
+    rng-after-bag = rng-after-shuffle
+  }
+  mino = bag-after-bag.at(0)
+  let bag-after-draw = bag-after-bag.slice(1, bag-after-bag.len())
+  (rng-after-bag, bag-after-draw, create-mino(mino, cols, rows))
 }
 
 #let render-map(map, bg-color: rgb("#f3f3ed")) = {
@@ -108,7 +125,7 @@
   if state.hold == none {
     state.hold = create-mino(minoes.at(state.current.index), cols, rows)
     state.current = state.next
-    (state.rng, state.next) = new-mino(state.rng, cols, rows)
+    (state.rng, state.mino-bag, state.next) = new-mino(state.rng, state.mino-bag, cols, rows)
   } else {
     let hold-mino = state.hold
     state.hold = create-mino(minoes.at(state.current.index), cols, rows)
@@ -211,7 +228,7 @@
     }
     state.can-hold = true
     state.current = state.next
-    (state.rng, state.next) = new-mino(state.rng, cols, rows)
+    (state.rng, state.mino-bag, state.next) = new-mino(state.rng, state.mino-bag, cols, rows)
   }
   state
 }
@@ -239,8 +256,11 @@
 
   let chars = parse-actions(body)
 
+  let rng-initial = gen-rng(seed)
+  let (rng-after-initial-bag, bag-after-initial-bag) = shuffle-minoes(rng-initial)
   let state = (
-    rng: gen-rng(seed),
+    rng: rng-after-initial-bag,
+    mino-bag: bag-after-initial-bag,
     current: none,
     next: none,
     map: range(rows + 4).map(_ => range(cols).map(it => "_")),
@@ -250,8 +270,8 @@
     can-hold: true,
   )
 
-  (state.rng, state.current) = new-mino(state.rng, cols, rows)
-  (state.rng, state.next) = new-mino(state.rng, cols, rows)
+  (state.rng, state.mino-bag, state.current) = new-mino(rng-after-initial-bag, bag-after-initial-bag, cols, rows)
+  (state.rng, state.mino-bag, state.next) = new-mino(state.rng, state.mino-bag, cols, rows)
 
   for char in chars {
     if actions.left.any(it => it == char) {
