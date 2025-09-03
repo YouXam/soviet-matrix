@@ -228,7 +228,7 @@
     }
     state.can-hold = true
     state.current = state.next
-   (state.rng, state.mino-bag, state.next) = new-mino(state.rng, state.mino-bag, cols, rows)
+    (state.rng, state.mino-bag, state.next) = new-mino(state.rng, state.mino-bag, cols, rows)
   }
   state
 }
